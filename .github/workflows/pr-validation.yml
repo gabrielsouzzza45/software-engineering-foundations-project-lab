@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # 🔥 importante para evitar problemas de histórico
+          fetch-depth: 0
 
       # Validar descrição da PR
       - name: Check PR description
@@ -45,15 +45,18 @@ jobs:
               core.setFailed("All checklist items must be completed.");
             }
 
-      # Validar se mexeu na pasta correta do grupo
+      # VALIDAÇÃO CORRETA DOS ARQUIVOS (FIX DEFINITIVO)
       - name: Validate group folder changes
         run: |
-          echo "Fetching base branch..."
-          git fetch origin main
+          echo "Checking changed files using PR context..."
 
-          echo "Checking changed files..."
-          # 🔥 CORREÇÃO AQUI (resolve o erro de merge base)
-          files=$(git diff --name-only origin/main..HEAD)
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.event.pull_request.head.sha }}
+
+          echo "Base SHA: $BASE_SHA"
+          echo "Head SHA: $HEAD_SHA"
+
+          files=$(git diff --name-only $BASE_SHA $HEAD_SHA)
 
           echo "Changed files:"
           echo "$files"
